@@ -32,7 +32,15 @@ if 'sslmode' in url.query:
     ctx.verify_mode = ssl.CERT_NONE
     connect_args["ssl"] = ctx
 
-engine = create_async_engine(url, echo=True, connect_args=connect_args)
+engine = create_async_engine(
+    url,
+    echo=True,
+    connect_args=connect_args,
+    pool_pre_ping=True,  # Checks if connection is alive before using
+    pool_recycle=300,    # Recycle connections after 5 minutes
+    pool_size=5,
+    max_overflow=10
+)
 
 AsyncSessionLocal = sessionmaker(
     engine, class_=AsyncSession, expire_on_commit=False
